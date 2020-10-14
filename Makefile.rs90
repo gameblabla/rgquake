@@ -78,7 +78,8 @@ SOURCE_FILES = \
 # tool macros
 CC := /opt/rs90-toolchain/usr/bin/mipsel-linux-gcc
 INCLUDES := -I/opt/rs90-toolchain/usr/mipsel-rs90-linux-musl/sysroot/usr/include/SDL
-CCFLAG := -Wall -Wextra -Os -fdata-sections -ffunction-sections -mframe-header-opt -fsingle-precision-constant -fno-common -flto -mips32 -DSDL -D__linux__ -D_GNU_SOURCE=1 -D_REENTRANT $(INCLUDES) -DRS90
+CCFLAG := -Wall -Wextra -mplt -mno-shared -Os -fdata-sections -ffunction-sections -mframe-header-opt -fsingle-precision-constant -fno-common -flto -mips32 -DSDL -D__linux__ -D_GNU_SOURCE=1 -D_REENTRANT $(INCLUDES) -DRS90
+CCFLAG += -fprofile-use
 DBGFLAG := -g
 CCOBJFLAG := $(CCFLAG) -c
 LDFLAGS := -lm -lSDL -lpthread -Wl,--as-needed -Wl,--gc-sections -flto -s
