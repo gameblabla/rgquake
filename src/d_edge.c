@@ -29,6 +29,10 @@ int			screenwidth;
 int			ubasestep, errorterm, erroradjustup, erroradjustdown;
 int			vstartscan;
 
+fixed16_t	sadjust, tadjust;
+fixed16_t	bbextents, bbextentt;
+void (*prealspandrawer)(void);
+
 // FIXME: should go away
 extern void			R_RotateBmodel (void);
 extern void			R_TransformFrustum (void);

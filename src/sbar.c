@@ -259,10 +259,14 @@ Sbar_DrawPic
 */
 void Sbar_DrawPic (int x, int y, qpic_t *pic)
 {
+#ifdef RS90
+	Draw_Pic (x, y + (vid.height-SBAR_HEIGHT), pic);
+#else
 	if (cl.gametype == GAME_DEATHMATCH)
 		Draw_Pic (x /* + ((vid.width - 320)>>1)*/, y + (vid.height-SBAR_HEIGHT), pic);
 	else
 		Draw_Pic (x + ((vid.width - 320)>>1), y + (vid.height-SBAR_HEIGHT), pic);
+#endif
 }
 
 /*
@@ -272,10 +276,14 @@ Sbar_DrawTransPic
 */
 void Sbar_DrawTransPic (int x, int y, qpic_t *pic)
 {
+#ifdef RS90
+	Draw_TransPic (x, y + (vid.height-SBAR_HEIGHT), pic);
+#else
 	if (cl.gametype == GAME_DEATHMATCH)
 		Draw_TransPic (x /*+ ((vid.width - 320)>>1)*/, y + (vid.height-SBAR_HEIGHT), pic);
 	else
 		Draw_TransPic (x + ((vid.width - 320)>>1), y + (vid.height-SBAR_HEIGHT), pic);
+#endif
 }
 
 /*
@@ -300,10 +308,14 @@ Sbar_DrawString
 */
 void Sbar_DrawString (int x, int y, char *str)
 {
+#ifdef RS90
+	Draw_String (x, y+ vid.height-SBAR_HEIGHT, str);
+#else
 	if (cl.gametype == GAME_DEATHMATCH)
 		Draw_String (x /*+ ((vid.width - 320)>>1)*/, y+ vid.height-SBAR_HEIGHT, str);
 	else
 		Draw_String (x + ((vid.width - 320)>>1), y+ vid.height-SBAR_HEIGHT, str);
+#endif
 }
 
 /*
@@ -925,6 +937,61 @@ Sbar_Draw
 */
 void Sbar_Draw (void)
 {
+#ifdef RS90
+    if (scr_con_current == vid.height)
+	return;			// console is full screen
+	
+	if (scr_viewsize.value == 120)
+	return;
+
+    if (sb_updates >= vid.numpages)
+	return;
+
+    scr_copyeverything = 1;
+
+    sb_updates++;
+
+	Draw_TileClear(0, vid.height-24, 240, 24);
+
+	// face
+	Sbar_DrawFace();
+
+	// health
+	Sbar_DrawNum(24, 0, cl.stats[STAT_HEALTH], 3,
+		     cl.stats[STAT_HEALTH] <= 25);
+
+	// ammo icon
+	if (rogue) 
+	{
+		if (cl.items & RIT_SHELLS)
+			Sbar_DrawPic (112, 0, sb_ammo[0]);
+		else if (cl.items & RIT_NAILS)
+			Sbar_DrawPic (112, 0, sb_ammo[1]);
+		else if (cl.items & RIT_ROCKETS)
+			Sbar_DrawPic (112, 0, sb_ammo[2]);
+		else if (cl.items & RIT_CELLS)
+			Sbar_DrawPic (112, 0, sb_ammo[3]);
+		else if (cl.items & RIT_LAVA_NAILS)
+			Sbar_DrawPic (112, 0, rsb_ammo[0]);
+		else if (cl.items & RIT_PLASMA_AMMO)
+			Sbar_DrawPic (112, 0, rsb_ammo[1]);
+		else if (cl.items & RIT_MULTI_ROCKETS)
+			Sbar_DrawPic (112, 0, rsb_ammo[2]);
+	} 
+	else 
+	{
+		if (cl.items & IT_SHELLS)
+			Sbar_DrawPic (112, 0, sb_ammo[0]);
+		else if (cl.items & IT_NAILS)
+			Sbar_DrawPic (112, 0, sb_ammo[1]);
+		else if (cl.items & IT_ROCKETS)
+			Sbar_DrawPic (112, 0, sb_ammo[2]);
+		else if (cl.items & IT_CELLS)
+			Sbar_DrawPic (112, 0, sb_ammo[3]);
+	}
+
+	Sbar_DrawNum(128, 0, cl.stats[STAT_AMMO], 3, cl.stats[STAT_AMMO] <= 10);
+#else
 	if (scr_con_current == vid.height)
 		return;		// console is full screen
 
@@ -1041,6 +1108,7 @@ void Sbar_Draw (void)
 		if (cl.gametype == GAME_DEATHMATCH)
 			Sbar_MiniDeathmatchOverlay ();
 	}
+#endif
 }
 
 //=============================================================================
@@ -1274,7 +1342,29 @@ void Sbar_IntermissionOverlay (void)
 
 	scr_copyeverything = 1;
 	scr_fullupdate = 0;
-
+	
+#ifdef RS90
+    char tmp[16];
+    M_Print(8,8, "MISSION COMPLETE");
+    
+    M_Print(8,24, "MONSTER(S) KILLED");
+    snprintf(tmp, sizeof(tmp), "%d / %d",cl.stats[STAT_MONSTERS], cl.stats[STAT_TOTALMONSTERS]);
+	M_Print(8,40, tmp);
+	
+    M_Print(8,56, "SECRET(S) DISCOVERED");
+    snprintf(tmp, sizeof(tmp), "%d / %d",cl.stats[STAT_SECRETS], cl.stats[STAT_TOTALSECRETS]);
+	M_Print(8,72, tmp);
+	
+	if (cl.stats[STAT_MONSTERS] == cl.stats[STAT_TOTALMONSTERS] && cl.stats[STAT_SECRETS] == cl.stats[STAT_TOTALSECRETS])
+	{
+		M_Print(8,96, "PERFECT !");
+		M_Print(8,112, "PRESS A BUTTON TO CONTINUE");
+	}
+	else
+	{
+		M_Print(8,96, "PRESS A BUTTON TO CONTINUE");
+	}
+#else
 	if (cl.gametype == GAME_DEATHMATCH)
 	{
 		Sbar_DeathmatchOverlay ();
@@ -1301,8 +1391,8 @@ void Sbar_IntermissionOverlay (void)
 
 	Sbar_IntermissionNumber (160, 144, cl.stats[STAT_MONSTERS], 3, 0);
 	Draw_TransPic (232,144,sb_slash);
-	Sbar_IntermissionNumber (240, 144, cl.stats[STAT_TOTALMONSTERS], 3, 0);
-
+	Sbar_IntermissionNumber (240, 144, cl.stats[STAT_TOTALMONSTERS], 3, 0);*/
+#endif
 }
 
 

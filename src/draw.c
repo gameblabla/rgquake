@@ -142,6 +142,10 @@ void Draw_Character (int x, int y, int num)
 
 	num &= 255;
 	
+#ifdef RS90
+	if (y > vid.height-8 || x > vid.width-8 || x < 8) return;
+#endif
+
 	if (y <= -8)
 		return;			// totally off screen
 
@@ -297,7 +301,8 @@ void Draw_Pic (int x, int y, qpic_t *pic)
 		(y < 0) ||
 		(y + pic->height > vid.height))
 	{
-		Sys_Error ("Draw_Pic: bad coordinates");
+		//Sys_Error ("Draw_Pic: bad coordinates");
+		return;
 	}
 
 	source = pic->data;
@@ -346,7 +351,8 @@ void Draw_TransPic (int x, int y, qpic_t *pic)
 	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
 		 (unsigned)(y + pic->height) > vid.height)
 	{
-		Sys_Error ("Draw_TransPic: bad coordinates");
+		return;
+		//Sys_Error ("Draw_TransPic: bad coordinates");
 	}
 		
 	source = pic->data;
@@ -433,7 +439,8 @@ void Draw_TransPicTranslate (int x, int y, qpic_t *pic, byte *translation)
 	if (x < 0 || (unsigned)(x + pic->width) > vid.width || y < 0 ||
 		 (unsigned)(y + pic->height) > vid.height)
 	{
-		Sys_Error ("Draw_TransPic: bad coordinates");
+		//Sys_Error ("Draw_TransPic: bad coordinates");
+		return;
 	}
 		
 	source = pic->data;

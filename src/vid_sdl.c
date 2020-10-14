@@ -10,8 +10,13 @@ viddef_t    vid;                // global video state
 unsigned short  d_8to16table[256];
 
 // The original defaults
+#ifdef RS90
+#define    BASEWIDTH    240
+#define    BASEHEIGHT   160 // 200
+#else
 #define    BASEWIDTH    320
 #define    BASEHEIGHT   240 // 200
+#endif
 // Much better for high resolution displays
 //#define    BASEWIDTH    (320*2)
 //#define    BASEHEIGHT   (200*2)
@@ -29,10 +34,6 @@ static SDL_Joystick *analog_stick = NULL;
 
 static int joy1_x, joy1_y, joy2_x, joy2_y;
 float weapwheel_x, weapwheel_y;
-
-// No support for option menus
-void (*vid_menudrawfn)(void) = NULL;
-void (*vid_menukeyfn)(int key) = NULL;
 
 void VID_SetPalette (unsigned char *palette)
 {
@@ -113,7 +114,7 @@ void RG_ErrorScreen (char *error, ...)
     if (!SDL_WasInit(SDL_INIT_VIDEO))
     {
         SDL_Init (SDL_INIT_VIDEO);
-        screen = SDL_SetVideoMode(BASEWIDTH, BASEHEIGHT, 8, SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
+        screen = SDL_SetVideoMode(BASEWIDTH, BASEHEIGHT, 8, SDL_SWSURFACE|SDL_HWPALETTE);
         SDL_ShowCursor(0);
     }
 
@@ -194,7 +195,7 @@ void VID_Init (unsigned char *palette)
     }
 
     // Set video width, height and flags
-    flags = (SDL_SWSURFACE|SDL_HWPALETTE|SDL_FULLSCREEN);
+    flags = (SDL_SWSURFACE|SDL_HWPALETTE);
 
     if ( COM_CheckParm ("-fullscreen") )
         flags |= SDL_FULLSCREEN;
@@ -423,7 +424,7 @@ void Sys_SendKeyEvents(void)
                 Key_Event(sym, state);
                 break;
 
-            case SDL_MOUSEMOTION:
+            /*case SDL_MOUSEMOTION:
                 if ( (event.motion.x != (vid.width/2)) ||
                      (event.motion.y != (vid.height/2)) ) {
                     mouse_x = event.motion.xrel*10;
@@ -459,7 +460,7 @@ void Sys_SendKeyEvents(void)
                     }
                 }
                 break;
-
+*/
             case SDL_QUIT:
                 CL_Disconnect ();
                 Host_ShutdownServer(false);        
@@ -473,40 +474,39 @@ void Sys_SendKeyEvents(void)
 
 void IN_Init (void)
 {
-    if ( COM_CheckParm ("-nomouse") )
+   /* if ( COM_CheckParm ("-nomouse") )
         return;
     mouse_x = mouse_y = 0.0;
-    mouse_avail = 1;
+    mouse_avail = 1;*/
 }
 
 void IN_Init_Post (void)
 {
-    SDL_JoystickEventState(SDL_ENABLE);
+    /*SDL_JoystickEventState(SDL_ENABLE);
 
     int joysticksNum = SDL_NumJoysticks();
     if (joysticksNum > 0)
     {
         analog_stick = SDL_JoystickOpen(0);
         printf( "Joysticks connected: %i\n", joysticksNum);
-    }
+    }*/
 }
 
 void IN_Shutdown (void)
 {
-    mouse_avail = 0;
+   /* mouse_avail = 0;
     SDL_JoystickClose(analog_stick);
-    analog_stick = NULL;
+    analog_stick = NULL;*/
 }
 
 void IN_Commands (void)
 {
-    int i;
+    /*int i;
     int mouse_buttonstate;
    
     if (!mouse_avail) return;
    
     i = SDL_GetMouseState(NULL, NULL);
-    /* Quake swaps the second and third buttons */
     mouse_buttonstate = (i & ~0x06) | ((i & 0x02)<<1) | ((i & 0x04)>>1);
     for (i=0 ; i<3 ; i++) {
         if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
@@ -515,7 +515,7 @@ void IN_Commands (void)
         if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
             Key_Event (K_MOUSE1 + i, false);
     }
-    mouse_oldbuttonstate = mouse_buttonstate;
+    mouse_oldbuttonstate = mouse_buttonstate;*/
 }
 
 float moveagain_time;

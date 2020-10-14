@@ -135,7 +135,11 @@ Draws one solid graphics character
 */
 void M_DrawCharacter (int cx, int line, int num)
 {
+#ifdef RS90
+	Draw_Character ( cx, line, num);
+#else
 	Draw_Character ( cx + ((vid.width - 320)>>1), line, num);
+#endif
 }
 
 void M_Print (int cx, int cy, char *str)
@@ -160,12 +164,20 @@ void M_PrintWhite (int cx, int cy, char *str)
 
 void M_DrawTransPic (int x, int y, qpic_t *pic)
 {
+#ifdef RS90
+	Draw_TransPic (x, y, pic);
+#else
 	Draw_TransPic (x + ((vid.width - 320)>>1), y, pic);
+#endif
 }
 
 void M_DrawPic (int x, int y, qpic_t *pic)
 {
+#ifdef RS90
+	Draw_Pic (x, y, pic);
+#else
 	Draw_Pic (x + ((vid.width - 320)>>1), y, pic);
+#endif
 }
 
 byte identityTable[256];
@@ -317,6 +329,13 @@ void M_Main_Draw (void)
 	int		f;
 	qpic_t	*p;
 
+#ifdef RS90
+	M_DrawTransPic (0, 24, Draw_CachePic ("gfx/mainmenu.lmp") );
+
+	f = (int)(host_time * 10)%6;
+
+	M_DrawTransPic (224, 22 + m_main_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#else
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/ttl_main.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
@@ -325,6 +344,7 @@ void M_Main_Draw (void)
 	f = (int)(host_time * 10)%6;
 
 	M_DrawTransPic (54, 32 + m_main_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#endif
 }
 
 
@@ -402,6 +422,13 @@ void M_SinglePlayer_Draw (void)
 	int		f;
 	qpic_t	*p;
 
+#ifdef RS90
+	M_DrawTransPic (8, 24, Draw_CachePic ("gfx/sp_menu.lmp") );
+
+	f = (int)(host_time * 10)%6;
+
+	M_DrawTransPic (164, 22 + m_singleplayer_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#else
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/ttl_sgl.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
@@ -410,6 +437,7 @@ void M_SinglePlayer_Draw (void)
 	f = (int)(host_time * 10)%6;
 
 	M_DrawTransPic (54, 32 + m_singleplayer_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#endif
 }
 
 
@@ -527,8 +555,13 @@ void M_Load_Draw (void)
 	int		i;
 	qpic_t	*p;
 
+#ifdef RS90
+	p = Draw_CachePic ("gfx/p_load.lmp");
+	M_DrawPic ( (240/2)-40, 4, p);
+#else
 	p = Draw_CachePic ("gfx/p_load.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
+#endif
 
 	for (i=0 ; i< MAX_SAVEGAMES; i++)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
@@ -543,9 +576,13 @@ void M_Save_Draw (void)
 	int		i;
 	qpic_t	*p;
 
+#ifdef RS90
+	p = Draw_CachePic ("gfx/p_save.lmp");
+	M_DrawPic ( (240/2)-40, 4, p);
+#else
 	p = Draw_CachePic ("gfx/p_save.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
-
+#endif
 	for (i=0 ; i<MAX_SAVEGAMES ; i++)
 		M_Print (16, 32 + 8*i, m_filenames[i]);
 
@@ -649,6 +686,25 @@ void M_MultiPlayer_Draw (void)
 {
 	int		f;
 	qpic_t	*p;
+	
+#ifdef RS90
+
+	/*M_Print (16, 32, "Join a game");
+	M_Print (16, 52, "New game");
+	M_Print (16, 72, "Setup");*/
+	/*M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
+	p = Draw_CachePic ("gfx/p_multi.lmp");
+	M_DrawPic ( 240/2, 4, p);*/
+	M_DrawTransPic (8, 8, Draw_CachePic ("gfx/mp_menu.lmp") );
+
+	f = (int)(host_time * 10)%6;
+
+	M_DrawTransPic (200, 8 + m_multiplayer_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+
+	if (serialAvailable || ipxAvailable || tcpipAvailable)
+		return;
+	M_PrintWhite ((320/2) - ((27*8)/2), 148, "No Communications Available");
+#else
 
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_multi.lmp");
@@ -662,6 +718,7 @@ void M_MultiPlayer_Draw (void)
 	if (serialAvailable || ipxAvailable || tcpipAvailable)
 		return;
 	M_PrintWhite ((320/2) - ((27*8)/2), 148, "No Communications Available");
+#endif
 }
 
 
@@ -737,7 +794,38 @@ void M_Menu_Setup_f (void)
 void M_Setup_Draw (void)
 {
 	qpic_t	*p;
+#ifdef RS90
+	p = Draw_CachePic ("gfx/p_multi.lmp");
+	M_DrawPic ( (320-p->width)/2, 4, p);
 
+	M_Print (64-48, 40, "Hostname");
+	M_DrawTextBox (160-48, 32, 16, 1);
+	M_Print (168-48, 40, setup_hostname);
+
+	M_Print (64-48, 56, "Your name");
+	M_DrawTextBox (160-48, 48, 16, 1);
+	M_Print (168-48, 56, setup_myname);
+
+	M_Print (64-48, 80, "Shirt color");
+	M_Print (64-48, 104, "Pants color");
+
+	M_DrawTextBox (64-48, 140-8, 14, 1);
+	M_Print (72-48, 140, "Accept Changes");
+
+	p = Draw_CachePic ("gfx/bigbox.lmp");
+	M_DrawTransPic (160-48, 64, p);
+	p = Draw_CachePic ("gfx/menuplyr.lmp");
+	M_BuildTranslationTable(setup_top*16, setup_bottom*16);
+	M_DrawTransPicTranslate (172-48, 72, p);
+
+	M_DrawCharacter (56-48, setup_cursor_table [setup_cursor], 12+((int)(realtime*4)&1));
+
+	if (setup_cursor == 0)
+		M_DrawCharacter (168-48 + 8*strlen(setup_hostname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
+
+	if (setup_cursor == 1)
+		M_DrawCharacter (168-48 + 8*strlen(setup_myname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
+#else
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_multi.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
@@ -769,6 +857,7 @@ void M_Setup_Draw (void)
 
 	if (setup_cursor == 1)
 		M_DrawCharacter (168 + 8*strlen(setup_myname), setup_cursor_table [setup_cursor], 10+((int)(realtime*4)&1));
+#endif
 }
 
 
@@ -932,6 +1021,72 @@ void M_Net_Draw (void)
 	int		f;
 	qpic_t	*p;
 
+#ifdef RS90
+
+	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
+	p = Draw_CachePic ("gfx/p_multi.lmp");
+	M_DrawPic ( 240/2, 4, p);
+
+	f = 32;
+
+	if (serialAvailable)
+	{
+		p = Draw_CachePic ("gfx/netmen1.lmp");
+	}
+	else
+	{
+		p = NULL;
+	}
+
+	if (p)
+		M_DrawTransPic (72, f, p);
+
+	f += 19;
+
+	if (serialAvailable)
+	{
+		p = Draw_CachePic ("gfx/netmen2.lmp");
+	}
+	else
+	{
+		p = NULL;
+	}
+
+	if (p)
+		M_DrawTransPic (72, f, p);
+
+	f += 19;
+	if (ipxAvailable)
+		p = Draw_CachePic ("gfx/netmen3.lmp");
+	else
+		p = Draw_CachePic ("gfx/dim_ipx.lmp");
+	M_DrawTransPic (72, f, p);
+
+	f += 19;
+	if (tcpipAvailable)
+		p = Draw_CachePic ("gfx/netmen4.lmp");
+	else
+		p = Draw_CachePic ("gfx/dim_tcp.lmp");
+	M_DrawTransPic (72, f, p);
+
+	if (m_net_items == 5)	// JDC, could just be removed
+	{
+		f += 19;
+		p = Draw_CachePic ("gfx/netmen5.lmp");
+		M_DrawTransPic (72, f, p);
+	}
+
+	f = (320-26*8)/2;
+	M_DrawTextBox (f, 134, 24, 4);
+	f += 8;
+	M_Print (f, 142, net_helpMessage[m_net_cursor*4+0]);
+	M_Print (f, 150, net_helpMessage[m_net_cursor*4+1]);
+	M_Print (f, 158, net_helpMessage[m_net_cursor*4+2]);
+	M_Print (f, 166, net_helpMessage[m_net_cursor*4+3]);
+
+	f = (int)(host_time * 10)%6;
+	M_DrawTransPic (54, 32 + m_net_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#else
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_multi.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
@@ -1003,6 +1158,7 @@ void M_Net_Draw (void)
 
 	f = (int)(host_time * 10)%6;
 	M_DrawTransPic (54, 32 + m_net_cursor * 20,Draw_CachePic( va("gfx/menudot%i.lmp", f+1 ) ) );
+#endif
 }
 
 
@@ -1255,6 +1411,80 @@ void M_Options_Draw (void)
 	float		r;
 	qpic_t	*p;
 	int ypos;
+
+#ifdef RS90
+	ypos = 16;
+	M_Print (16, ypos, "Customize controls");
+	ypos += 8;
+	// M_Print (16, ypos, "         Go to console");
+	M_Print (16, ypos, "Cheats");
+	ypos += 8;
+	M_Print (16, ypos, "Reset defaults");
+	ypos += 8;
+	M_Print (16, ypos, "Screen size");
+	r = (scr_viewsize.value - 30) / (120 - 30);
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Brightness");
+	r = (1.0 - v_gamma.value) / 0.5;
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Music Volume");
+	r = bgmvolume.value;
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Sound Volume");
+	r = volume.value;
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Force Run");
+	M_DrawCheckbox (220-64, ypos, cl_forwardspeed.value > 200);
+
+	ypos += 8;
+	M_Print (16, ypos, "Invert Look Y");
+	M_DrawCheckbox (220-64, ypos, m_pitch.value < 0);
+
+	ypos += 8;
+	M_Print (16, ypos, "Look Sens. X");
+	r = (m_yaw.value - 0.12) / (0.62 - 0.12);
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Look Sens. Y");
+	r = (fabs(m_pitch.value) - 0.12) / (0.62 - 0.12);
+	M_DrawSlider (220-72, ypos, r);
+
+	ypos += 8;
+	M_Print (16, ypos, "Swap analogs");
+	M_DrawCheckbox (220-64, ypos, swap_analogs.value);
+
+	ypos += 8;
+	M_Print (16, ypos, "Weap. Wheel Stick");
+	if (weapwheel_use_move.value) M_Print(220-64, ypos, "move");
+	else M_Print(220-64, ypos, "look");
+
+	ypos += 8;
+	M_Print (16, ypos, "Crosshair");
+	M_DrawCheckbox (220-64, ypos, crosshair.value);
+
+	ypos += 8;
+	M_Print (16, ypos, "Autoaim");
+	if (sv_aim.value == 0) M_Print(220-64, ypos, "off");
+	if (sv_aim.value == 1) M_Print(220-64, ypos, "vertical");
+	if (sv_aim.value == 2) M_Print(220-64, ypos, "full");
+
+	ypos += 8;
+	M_Print (16, ypos, "Center weapon");
+	M_DrawCheckbox (220-64, ypos, center_weapon.value);
+
+// cursor
+	M_DrawCharacter (8, 16 + options_cursor*8, 12+((int)(realtime*4)&1));
+	
+#else
 	M_DrawTransPic (16, 4, Draw_CachePic ("gfx/qplaque.lmp") );
 	p = Draw_CachePic ("gfx/p_option.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
@@ -1357,6 +1587,7 @@ void M_Options_Draw (void)
 
 // cursor
 	M_DrawCharacter (200, 32 + options_cursor*8, 12+((int)(realtime*4)&1));
+#endif
 }
 
 
@@ -1623,7 +1854,48 @@ void M_Keys_Draw (void)
 	char	*name;
 	int		x, y;
 	qpic_t	*p;
+#ifdef RS90
+	//p = Draw_CachePic ("gfx/ttl_cstm.lmp");
+	//M_DrawPic ( 0, 4, p);
 
+	if (bind_grab)
+		M_Print (12, 8, "Press a button for this action");
+	else
+		M_Print (18, 8, "Start to change, Select to clear");
+
+// search for known bindings
+	for (i=0 ; i<NUMCOMMANDS ; i++)
+	{
+		y = 48-24 + 8*i;
+
+		M_Print (16, y, bindnames[i][1]);
+
+		l = strlen (bindnames[i][0]);
+
+		M_FindKeysForCommand (bindnames[i][0], keys);
+
+		if (keys[0] == -1)
+		{
+			M_Print (140, y, "???");
+		}
+		else
+		{
+			name = Key_KeynumToString (keys[0]);
+			M_Print (140, y, name);
+			x = strlen(name) * 8;
+			if (keys[1] != -1)
+			{
+				M_Print (140 + x + 8, y, "or");
+				M_Print (140 + x + 32, y, Key_KeynumToString (keys[1]));
+			}
+		}
+	}
+
+	if (bind_grab)
+		M_DrawCharacter (130, 48-24 + keys_cursor*8, '=');
+	else
+		M_DrawCharacter (130, 48-24 + keys_cursor*8, 12+((int)(realtime*4)&1));
+#else
 	p = Draw_CachePic ("gfx/ttl_cstm.lmp");
 	M_DrawPic ( (320-p->width)/2, 4, p);
 
@@ -1664,6 +1936,7 @@ void M_Keys_Draw (void)
 		M_DrawCharacter (130, 48 + keys_cursor*8, '=');
 	else
 		M_DrawCharacter (130, 48 + keys_cursor*8, 12+((int)(realtime*4)&1));
+#endif
 }
 
 
@@ -1931,6 +2204,12 @@ void M_Quit_Draw (void)
 	M_PrintWhite (16, 164, "registered trademark licensed to\n");
 	M_PrintWhite (16, 172, "Nothing Interactive, Inc. All rights\n");
 	M_PrintWhite (16, 180, "reserved. Press y to exit\n");
+#elif RS90
+	M_DrawTextBox (16, 16, 24, 4);
+	M_Print (24, 24,  quitMessage[msgNumber*4+0]);
+	M_Print (24, 32,  quitMessage[msgNumber*4+1]);
+	M_Print (24, 40, quitMessage[msgNumber*4+2]);
+	M_Print (24, 48, quitMessage[msgNumber*4+3]);
 #else
 	M_DrawTextBox (56, 76, 24, 4);
 	M_Print (64, 84,  quitMessage[msgNumber*4+0]);

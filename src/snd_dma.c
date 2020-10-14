@@ -63,8 +63,13 @@ int			num_sfx;
 
 sfx_t		*ambient_sfx[NUM_AMBIENTS];
 
+#ifdef RS90
+int 		desired_speed = 11025; //11025;
+int 		desired_bits = 8;
+#else
 int 		desired_speed = 48000; //11025;
 int 		desired_bits = 16;
+#endif
 
 int sound_started=0;
 
