@@ -33,6 +33,8 @@ char *cachedir = "/tmp";
 cvar_t  sys_linerefresh = {"sys_linerefresh","0"};// set for entity display
 cvar_t  sys_nostdout = {"sys_nostdout","0"};
 
+char savedir_game[512];
+
 // =======================================================================
 // General routines
 // =======================================================================
@@ -375,6 +377,13 @@ int main (int c, char **v)
 	extern int vcrFile;
 	extern int recording;
 	static int frame;
+	
+	snprintf(savedir_game, sizeof(savedir_game), "%s/.rgquake", getenv("HOME"));
+
+	struct stat st = {0};
+	if (stat(savedir_game, &st) == -1) {
+		mkdir(savedir_game, 0755);
+	}
 
 	moncontrol(0);
 

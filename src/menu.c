@@ -498,6 +498,8 @@ int		load_cursor;		// 0 < load_cursor < MAX_SAVEGAMES
 char	m_filenames[MAX_SAVEGAMES][SAVEGAME_COMMENT_LENGTH+1];
 int		loadable[MAX_SAVEGAMES];
 
+extern char savedir_game[512];
+
 void M_ScanSaves (void)
 {
 	int		i, j;
@@ -509,7 +511,7 @@ void M_ScanSaves (void)
 	{
 		strcpy (m_filenames[i], "--- UNUSED SLOT ---");
 		loadable[i] = false;
-		sprintf (name, "%s/s%i.sav", com_gamedir, i);
+		sprintf (name, "%s/s%i.sav", savedir_game, i);
 		f = fopen (name, "r");
 		if (!f)
 			continue;

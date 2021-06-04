@@ -18,10 +18,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 // common.c -- misc functions used in client and server
-
+#include <stdint.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "quakedef.h"
 
+#include <sys/stat.h>   // stat
+#include <stdbool.h>    // bool type
+
+static uint8_t file_exists (char *filename)
+{
+	struct stat   buffer;   
+	return (stat (filename, &buffer) == 0);
+}
+
 #define NUM_SAFE_ARGVS  7
+
+char home[256];
 
 static char     *largv[MAX_NUM_ARGVS + NUM_SAFE_ARGVS + 1];
 static char     *argvdummy = " ";
@@ -1289,10 +1302,11 @@ The filename will be prefixed by the current game directory
 */
 void COM_WriteFile (char *filename, void *data, int len)
 {
+	extern char savedir_game[512];
 	int             handle;
 	char    name[MAX_OSPATH];
 	
-	sprintf (name, "%s/%s", com_gamedir, filename);
+	sprintf (name, "%s/%s", savedir_game, filename);
 
 	handle = Sys_FileOpenWrite (name);
 	if (handle == -1)
@@ -1771,10 +1785,21 @@ void COM_InitFilesystem (void)
 		char actualpath[4096+1];
 		// sprintf(dirname, "./%s", GAMENAME);
 		// COM_AddGameDirectory(dirname);
+		
+		
 		realpath("./id1", actualpath);
-
+		
 		COM_AddGameDirectory(actualpath);
-
+		
+		/*
+		snprintf(home, sizeof(home), "%/.tyrquake", getenv("HOME"));
+		mkdir(home, 0755);
+		snprintf(home, sizeof(home), "%/.tyrquake/id1", getenv("HOME"));
+		mkdir(home, 0755);
+		
+		COM_AddGameDirectory(home);
+		*/
+		//COM_AddGameDirectory(home, ".tyrquake/id1");
 		strcpy (basedir, com_argv[i+1]);
 	}
 	else
@@ -1787,6 +1812,10 @@ void COM_InitFilesystem (void)
 		if ((basedir[j-1] == '\\') || (basedir[j-1] == '/'))
 			basedir[j-1] = 0;
 	}
+
+
+	snprintf(home, sizeof(home), "%s/.tyrquake/id1", getenv("HOME"));
+	COM_AddGameDirectory(home);
 
 //
 // -cachedir <path>

@@ -12,7 +12,11 @@ unsigned short  d_8to16table[256];
 // The original defaults
 #ifdef RS90
 #define    BASEWIDTH    240
+#ifdef FUNKEY
+#define    BASEHEIGHT   240 // 200
+#else
 #define    BASEHEIGHT   160 // 200
+#endif
 #else
 #define    BASEWIDTH    320
 #define    BASEHEIGHT   240 // 200

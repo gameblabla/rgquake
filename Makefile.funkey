@@ -34,11 +34,10 @@ SOURCE_FILES = \
 	mathlib.c		\
 	menu.c			\
 	model.c			\
-	net_bsd.c		\
 	net_dgrm.c		\
 	net_loop.c		\
 	net_main.c		\
-	net_udp.c		\
+	net_none.c		\
 	net_vcr.c		\
 	net_wso.c		\
 	nonintel.c		\
@@ -77,12 +76,13 @@ SOURCE_FILES = \
 	zone.c			\
 
 # tool macros
-CC := mipsel-linux-gcc
-INCLUDES := -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/SDL
-CCFLAG := -ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations -Wall -Wextra -O2 -DSDL -D__linux__ -D_GNU_SOURCE=1 -D_REENTRANT $(INCLUDES)
+CC := /opt/funkey-toolchain/usr/bin/arm-linux-gcc
+INCLUDES := -I/opt/funkey-toolchain/usr/arm-buildroot-linux-musleabihf/sysroot/usr/include/SDL
+CCFLAG := -Wall -Wextra -Os -fdata-sections -ffunction-sections -DSDL -D__linux__ -D_GNU_SOURCE=1 -D_REENTRANT $(INCLUDES) -DRS90 -DFUNKEY
+CCFLAG += 
 DBGFLAG := -g
 CCOBJFLAG := $(CCFLAG) -c
-LDFLAGS := -lm -lSDL -lpthread
+LDFLAGS := -lc -lgcc -lm -lSDL -lasound -lpthread -Wl,--as-needed -Wl,--gc-sections -flto -s
 
 # path macros
 BIN_PATH := bin

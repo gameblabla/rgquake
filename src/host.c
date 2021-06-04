@@ -244,6 +244,7 @@ Host_WriteConfiguration
 Writes key bindings and archived cvars to config.cfg
 ===============
 */
+extern char savedir_game[512];
 void Host_WriteConfiguration (void)
 {
 	FILE	*f;
@@ -252,7 +253,7 @@ void Host_WriteConfiguration (void)
 // config.cfg cvars
 	if (host_initialized & !isDedicated)
 	{
-		f = fopen (va("%s/rg_config.cfg",com_gamedir), "w");
+		f = fopen (va("%s/config.cfg",savedir_game), "w");
 		if (!f)
 		{
 			Con_Printf ("Couldn't write rg_config.cfg.\n");

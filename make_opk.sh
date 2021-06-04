@@ -5,7 +5,7 @@ cp ./bin/rgquake ./opk_data/
 cd opk_data
 
 FLIST="rgquake"
-FLIST="${FLIST} default.gcw0.desktop"
+FLIST="${FLIST} default.rs90.desktop"
 FLIST="${FLIST} logo.png"
 FLIST="${FLIST} manual-gcw0.txt"
 FLIST="${FLIST} id1"
